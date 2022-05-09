@@ -69,6 +69,12 @@ class AerialMap:
             with Image.open(f) as img:
                 img.show()
 
+    def get_coordinate_from_pixel(self, x, y):
+        raise NotImplementedError
+
+    def get_pixel_from_coordinate(self, lat, lng):
+        raise NotImplementedError
+
 
 if __name__ == "__main__":
     box_coordinate_1_world_lng, box_coordinate_1_world_lat = 4.340329, 51.997908
