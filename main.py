@@ -11,7 +11,7 @@ def t_nl_global(lng, lat):
     return transformer.transform(lng, lat)
 
 
-def t_gloabl_nl(lng, lat):
+def t_global_nl(lng, lat):
     transformer = Transformer.from_crs("epsg:28992", "epsg:4326", always_xy=True)
     return transformer.transform(lng, lat)
 
@@ -88,3 +88,4 @@ if __name__ == "__main__":
                     y_length)
 
     map.get_picture()
+
