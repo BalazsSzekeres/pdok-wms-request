@@ -123,13 +123,13 @@ class AerialMapRetriever:
 
         return x_pixels, y_pixels
 
-    def get_picture_from_centre(self, centre, width, height, x_pixels=None, y_pixels=None, resolution=None):
+    def get_map_from_centre(self, centre, width, height, x_pixels=None, y_pixels=None, resolution=None):
         bbox = [[centre[0] - width/2, centre[1] - height/2],
                 [centre[0] + width/2, centre[1] + height/2]]
         
         return self.get_picture_from_corners(bbox, x_pixels, y_pixels, resolution)
 
-    def get_picture_from_corners(self, bbox, x_pixels=None, y_pixels=None, resolution=None):
+    def get_map_from_corners(self, bbox, x_pixels=None, y_pixels=None, resolution=None):
         bbox_global = [list(self.transformer.t_nl_global(*coords)) for coords in bbox]
 
         if x_pixels is None or y_pixels is None:
@@ -165,6 +165,7 @@ if __name__ == "__main__":
     bbox = [[bbox_1_lon, bbox_1_lat],
             [bbox_2_lon, bbox_2_lat]]
 
+    print(bbox)
     width, height = get_edges_distance(bbox_1_lon, bbox_1_lat, bbox_2_lon, bbox_2_lat)
     centre = [bbox_1_lon + width/2, bbox_1_lat + height/2]
     #y_length = 1000
@@ -175,7 +176,7 @@ if __name__ == "__main__":
 
     map_retriever = AerialMapRetriever(resolution)
 
-    map_from_corners = map_retriever.get_picture_from_corners(bbox)
+    map_from_corners = map_retriever.get_map_from_corners(bbox)
     #map_from_corners.show()
     pixel = map_from_corners.get_pixel_from_coordinate(bbox_1_lon, bbox_1_lat)
     #pixel = np.array(map_from_corners.get_pixel_from_coordinate(bbox_2_lon - 1e-8, bbox_2_lat - 1e-8)) - 1
@@ -191,7 +192,7 @@ if __name__ == "__main__":
     #map_array[pixel[1], pixel[0]] = [255, 0, 0]
     plt.imshow(map_array)
     plt.show()
-    #map_from_centre = map_retriever.get_picture_from_centre(centre, width, height)
+    #map_from_centre = map_retriever.get_map_from_centre(centre, width, height)
     #map_from_centre.show()
 
     #assert np.all(from_corners == from_centre)
