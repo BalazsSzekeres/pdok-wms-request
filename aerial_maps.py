@@ -111,7 +111,7 @@ if __name__ == "__main__":
     from_corners = map_.get_picture_from_corners(bbox)
     #plt.imshow(from_corners)
     #plt.show()
-    from_centre = map_.get_picture_from_centre(centre, width, height)
+    #from_centre = map_.get_picture_from_centre(centre, width, height)
     #plt.imshow(from_centre)
     #plt.show()
 
