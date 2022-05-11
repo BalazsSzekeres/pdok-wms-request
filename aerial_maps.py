@@ -65,7 +65,7 @@ class AerialMap:
         self.transformer = CoordTransformer()
 
     @property
-    def bbox_global(self):
+    def bbox_nl(self):
         return [list(self.transformer.t_nl_global(*coords)) for coords in self.bbox]
 
     def get_coordinate_from_pixel(self, x, y):
@@ -75,19 +75,19 @@ class AerialMap:
         if not is_coord_in_bbox((x, y), [[0,0], self.map_.shape[:2]]):
             raise ValueError('Pixel does not lie in map image')
 
-        coord_lon = (self.resolution * x) + self.bbox_global[0][0]
-        coord_lat = (self.resolution * y) + self.bbox_global[0][1] 
+        coord_lon = (self.resolution * x) + self.bbox_nl[0][0]
+        coord_lat = (self.resolution * y) + self.bbox_nl[0][1] 
 
         return self.transformer.t_global_nl(coord_lon, coord_lat)
 
     def get_pixel_from_coordinate(self, lon, lat):
-        lon_global, lat_global = self.transformer.t_nl_global(lon, lat)
-        if not is_coord_in_bbox((lon_global, lat_global), self.bbox_global):
+        lon_nl, lat_nl = self.transformer.t_nl_global(lon, lat)
+        if not is_coord_in_bbox((lon_nl, lat_nl), self.bbox_nl):
             raise ValueError('Coordinates do not lie in bounding box')
 
-        bbox_1_lon, bbox_1_lat = self.bbox_global[0] 
-        pixel_x = int((lon_global - bbox_1_lon) / self.resolution)
-        pixel_y = int((lat_global - bbox_1_lat) / self.resolution)
+        bbox_1_lon, bbox_1_lat = self.bbox_nl[0] 
+        pixel_x = int((lon_nl - bbox_1_lon) / self.resolution)
+        pixel_y = int((lat_nl - bbox_1_lat) / self.resolution)
 
         return pixel_x, pixel_y
 
@@ -130,15 +130,15 @@ class AerialMapRetriever:
         return self.get_picture_from_corners(bbox, x_pixels, y_pixels, resolution)
 
     def get_map_from_corners(self, bbox, x_pixels=None, y_pixels=None, resolution=None):
-        bbox_global = [list(self.transformer.t_nl_global(*coords)) for coords in bbox]
+        bbox_nl = [list(self.transformer.t_nl_global(*coords)) for coords in bbox]
 
         if x_pixels is None or y_pixels is None:
-            x_pixels, y_pixels = self._get_pixels(bbox_global, x_pixels, y_pixels, resolution)
+            x_pixels, y_pixels = self._get_pixels(bbox_nl, x_pixels, y_pixels, resolution)
 
-        bbox_1_lon = bbox_global[0][0]
-        bbox_1_lat = bbox_global[0][1]
-        bbox_2_lon = bbox_global[1][0]
-        bbox_2_lat = bbox_global[1][1]
+        bbox_1_lon = bbox_nl[0][0]
+        bbox_1_lat = bbox_nl[0][1]
+        bbox_2_lon = bbox_nl[1][0]
+        bbox_2_lat = bbox_nl[1][1]
         params = {'WIDTH': x_pixels, 'HEIGHT': y_pixels,
                   'BBOX': f'{bbox_1_lon},'
                           f'{bbox_1_lat},'
