@@ -52,8 +52,13 @@ class AerialMap:
 
 
 class AerialMapRetriever:
-    def __init__(self, resolution=None):
+    def __init__(self,
+            server_url="https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
+            "&FORMAT=image/png&TRANSPARENT=true&LAYERS=Actueel_ortho25&STYLES=&CRS=EPSG:28992",
+            resolution=None):
+        self.server_url = server_url 
         self.resolution = resolution    # in m/pixel
+
         self.transformer = CoordTransformer()
 
     def _get_pixels_from_resolution(self, bbox, resolution):
@@ -100,10 +105,7 @@ class AerialMapRetriever:
                           f'{bbox_2_lon},'
                           f'{bbox_2_lat}'}
 
-        response = requests.get(
-            "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
-            "&FORMAT=image/png&TRANSPARENT=true&LAYERS=2019_ortho25&STYLES=&CRS=EPSG:28992",
-            params)
+        response = requests.get(self.server_url, params)
 
         response.raise_for_status()
         with io.BytesIO(response.content) as f:
@@ -120,16 +122,16 @@ if __name__ == "__main__":
     bbox = [[bbox_1_lon, bbox_1_lat],
             [bbox_2_lon, bbox_2_lat]]
 
-    print(bbox)
     width, height = get_edges_distance(bbox_1_lon, bbox_1_lat, bbox_2_lon, bbox_2_lat)
     centre = [bbox_1_lon + width/2, bbox_1_lat + height/2]
     #y_length = 1000
     #y_length = 3000
     #y_length = None 
     resolution = 1
+    #resolution = 0.2
     #resolution = 2 
 
-    map_retriever = AerialMapRetriever(resolution)
+    map_retriever = AerialMapRetriever(resolution=resolution)
 
     map_from_corners = map_retriever.get_map_from_corners(bbox)
     #map_from_corners.show()
