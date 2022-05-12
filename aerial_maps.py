@@ -54,28 +54,45 @@ class AerialMap:
 class AerialMapRetriever:
     def __init__(self,
             server_url="https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap"
-            "&FORMAT=image/png&TRANSPARENT=true&LAYERS=Actueel_ortho25&STYLES=&CRS=EPSG:28992",
-            resolution=None):
+            "&FORMAT=image/png&TRANSPARENT=true&LAYERS=2020_ortho25&STYLES=&CRS=EPSG:28992",
+            resolution=0.):
         self.server_url = server_url 
-        self.resolution = resolution    # in m/pixel
+        self.resolution = resolution    # in m/pixel (0. for max)
 
         self.transformer = CoordTransformer()
 
-    def _get_pixels_from_resolution(self, bbox, resolution):
+        # these are given by PDOK TODO make parameters 
+        # note: these are actually listed as 5000, but this leads to an 'Internal Server Error'
+        self.max_width = 4000
+        self.max_height = 4000
+
+    def _get_max_width_height(self, aspect_ratio):
+        if aspect_ratio >= 1.:
+            width = self.max_width 
+            height = int(width / aspect_ratio)
+        else:
+            height = self.max_height
+            width = int(height * aspect_ratio)
+        return width, height
+
+    def _get_pixels_from_resolution(self, bbox, resolution, aspect_ratio):
         if resolution is None:
             if self.resolution is None:
                 raise ValueError('Resolution unspecified.')
 
             resolution = self.resolution
 
-        edges_m = get_edges_distance(*[coord for coords in bbox for coord in coords])
-        edges_pixels = [edge_m / resolution for edge_m in edges_m]
+        if resolution == 0.:
+            edges_pixels = self._get_max_width_height(aspect_ratio)
+        else:
+            edges_m = get_edges_distance(*[coord for coords in bbox for coord in coords])
+            edges_pixels = [edge_m / resolution for edge_m in edges_m]
         return edges_pixels
 
     def _get_pixels(self, bbox, x_pixels, y_pixels, resolution):
         aspect_ratio = get_aspect_ratio(*[coord for coords in bbox for coord in coords])
         if x_pixels is None and y_pixels is None:
-            x_pixels, y_pixels = self._get_pixels_from_resolution(bbox, resolution) 
+            x_pixels, y_pixels = self._get_pixels_from_resolution(bbox, resolution, aspect_ratio) 
         elif x_pixels is None:
             x_pixels = y_pixels * aspect_ratio
         elif y_pixels is None:
@@ -127,9 +144,10 @@ if __name__ == "__main__":
     #y_length = 1000
     #y_length = 3000
     #y_length = None 
-    resolution = 1
+    #resolution = 1
     #resolution = 0.2
     #resolution = 2 
+    resolution = 0.
 
     map_retriever = AerialMapRetriever(resolution=resolution)
 
