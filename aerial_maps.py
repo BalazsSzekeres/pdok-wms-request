@@ -87,7 +87,6 @@ class AerialMapRetriever:
         else:
             edges_m = get_edges_distance(*[coord for coords in bbox for coord in coords])
             edges_pixels = [int(edge_m / resolution) for edge_m in edges_m]
-        print(edges_pixels)
         return edges_pixels
 
     def _get_pixels(self, bbox, x_pixels, y_pixels, resolution):
@@ -126,7 +125,8 @@ class AerialMapRetriever:
                           f'{bbox_1_lat},'
                           f'{bbox_2_lon},'
                           f'{bbox_2_lat}'}
-
+        
+        # TODO catch errors in meaningful way
         response = requests.get(self.server_url, params)
 
         #print(response.text)
@@ -156,8 +156,10 @@ if __name__ == "__main__":
     lon = 4.3571
     centre = [lon, lat] 
     wh_in_m = True
-    width = 100
-    height = 200
+    #width = 100
+    #height = 200
+    width = 70
+    height = 70
 
     #y_length = 1000
     #y_length = 3000
