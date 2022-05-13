@@ -133,8 +133,8 @@ class AerialMapRetriever:
 
         response.raise_for_status()
         with io.BytesIO(response.content) as f:
-            img = Image.open(f)
-            img.save('example_5cm.png')
+            #img = Image.open(f)
+            #img.save('example_5cm.png')
             map_array = np.array(Image.open(f))
 
         width, _ = get_edges_distance(bbox_1_lon, bbox_1_lat, bbox_2_lon, bbox_2_lat)
